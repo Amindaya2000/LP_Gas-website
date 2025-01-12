@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        h1 {
+            text-align: center;
+            margin-top: 100px; /* Adjust for fixed navbar */
+            color: #007bff; /* Bootstrap primary color */
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        /* Additional CSS */
+        input[readonly] {
+            background-color: #f8f9fa; /* Light gray background for readonly fields */
+            border: 1px solid skyblue; /* Changed border color to sky blue */
+        }
+        /* New CSS added */
+        body {
+            background-color: #f0f8ff; /* Light blue background for the body */
+        }
+        .navbar {
+            background-color: skyblue; /* Changed navbar background color to sky blue */
+        }
+        .navbar-brand img {
+            height: 50px; /* Adjust logo size */
+        }
+        .btn-primary {
+            background-color: #007bff; /* Custom primary button color */
+            border: none; /* Remove border */
+        }
+        .btn-primary:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+        /* New CSS from file_context_0 */
+        .form-control {
+            border-radius: 0.25rem; /* Rounded corners for input fields */
+        }
+        .btn {
+            border-radius: 0.25rem; /* Rounded corners for buttons */
+        }
+    </style>
+</head>
+<body>
+
+    <!-------NavBar------>
+
+    <nav class="navbar navbar-expand-md fixed-top header">
+      <div class="container">
+        <a class="navbar-brand" href="#hero"><img src="img/logo1.jpg" class="logo"></a> 
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <ul class="navbar-nav ms-auto btn fs-5 register">
+              <li class="nav-item"><a href="homepage2.html" class="nav-link">Home</a></li>
+              <li class="nav-item"><a href="lpg_gas_booking.html" class="nav-link">LPG Gas Booking</a></li>
+              <li class="nav-item"><a href="Contact.html" class="nav-link">Contact US</a></li>
+              <!--<li class="nav-item"><a href="#faq" class="nav-link">FAQ</a></li>
+              <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logindemo">Sign up</a></li>   -->
+              <li class="nav-item"><a href="homepage.html" class="nav-link"  data-bs-target="">Sign out</a></li>  
+            </ul>
+        </div>
+      </div>
+    </nav>
+
+    <h1>Book Your Cylinders</h1>
+    <form id="bookingForm" method="POST" action="process_booking.php">
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="address">Delivery Address:</label>
+            <input type="text" id="address" name="address" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="quantity">Number of Cylinders:</label>
+            <select id="quantity" name="quantity" required class="form-control">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="pricePerCylinder">Price per Cylinder:</label>
+            <input type="number" id="pricePerCylinder" name="pricePerCylinder" value="3600" readonly class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="totalCost">Total Cost:</label>
+            <input type="text" id="totalCost" name="totalCost" value="3600.00" readonly class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Book Now</button>
+    </form>
+    
+    <h2>Saved Booking Data</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Phone Number</th>
+                <th>Delivery Address</th>
+                <th>Number of Cylinders</th>
+                <th>Total Cost</th>
+            </tr>
+        </thead>
+        <tbody id="bookingData">
+            <!-- Data will be populated here from the server -->
+        </tbody>
+    </table>
+
+    <script>
+        // Fetch saved booking data from the server
+        fetch('get_bookings.php')
+            .then(response => response.json())
+            .then(data => {
+                const bookingData = document.getElementById('bookingData');
+                data.forEach(booking => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${booking.name}</td>
+                        <td>${booking.email}</td>
+                        <td>${booking.phone}</td>
+                        <td>${booking.address}</td>
+                        <td>${booking.quantity}</td>
+                        <td>${booking.total_cost}</td>
+                    `;
+                    bookingData.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching booking data:', error));
+
+        // Calculate total cost based on quantity and price per cylinder
+        const quantitySelect = document.getElementById('quantity');
+        const pricePerCylinderInput = document.getElementById('pricePerCylinder');
+        const totalCostInput = document.getElementById('totalCost');
+
+        function calculateTotal() {
+            const quantity = parseInt(quantitySelect.value);
+            const pricePerCylinder = parseFloat(pricePerCylinderInput.value);
+            const totalCost = quantity * pricePerCylinder;
+            totalCostInput.value = totalCost.toFixed(2); // Format to 2 decimal places
+        }
+
+        quantitySelect.addEventListener('change', calculateTotal);
+        calculateTotal(); // Initial calculation on page load
+    </script>
+</body>
+</html>
